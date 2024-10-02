@@ -1,4 +1,4 @@
-name: 'Upload LightHouse Badger'
+name: 'Upload LightHouse Badger Action'
 description: 'This action takes a Lighthouse report, generates SVG badges for each category, and uploads them to an external service.'
 author: 'Alejandro Varela'
 

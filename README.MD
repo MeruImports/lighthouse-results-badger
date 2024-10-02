@@ -105,10 +105,6 @@ To securely pass your credentials to the action, you must add the following secr
 1. **AWS S3**: Add `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY`.
 2. **Azure Blob Storage**: Add `AZURE_CONTAINER_NAME`, `AZURE_STORAGE_ACCOUNT`, and `AZURE_STORAGE_KEY`.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
 ---
 
 This `README.md` outlines the purpose, usage examples, and necessary inputs/outputs for your Lighthouse Badger action. It includes examples for both AWS S3 and Azure Blob Storage, providing a clear guide for users to implement the action in their CI/CD pipelines.

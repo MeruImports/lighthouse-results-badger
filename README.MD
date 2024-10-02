@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Lighthouse Badger
-        uses: alejandro945/lighthouse-badger@v1
+        uses: MeruImports/lighthouse-results-badger@v1
         with:
           s3-bucket-name: ${{ secrets.AWS_S3_BUCKET }}
           s3-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -80,7 +80,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Lighthouse Badger
-        uses: alejandro945/lighthouse-badger@v1
+        uses: MeruImports/lighthouse-results-badger@v1
         with:
           azure-container-name: ${{ secrets.AZURE_CONTAINER_NAME }}
           azure-storage-account-name: ${{ secrets.AZURE_STORAGE_ACCOUNT }}

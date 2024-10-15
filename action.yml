@@ -48,6 +48,11 @@ inputs:
     required: false
     default: 'performance,accessibility,best-practices,seo'
 
+  upload-reports:
+    description: 'Boolean to upload the Lighthouse reports.'
+    required: false
+    default: 'false'
+
 outputs:
   s3-url:
     description: 'The URL of the uploaded SVG badges in S3.'

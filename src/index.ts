@@ -10,6 +10,7 @@ async function run() {
     // Obtener inputs del action
     const reportsPath = core.getInput('reports-path') || process.cwd();
     const uploadDestination = core.getInput('upload-destination') || 's3';
+    const uploadReports = core.getInput('upload-reports') || 'false';
 
     const s3BucketName = core.getInput('s3-bucket-name');
     const s3AccessKeyId = core.getInput('s3-access-key-id');
@@ -37,16 +38,20 @@ async function run() {
     for (const file of reportFiles) {
       const report = JSON.parse(fs.readFileSync(path.join(reportsPath, file), 'utf-8'));
 
+      // 1. Validate the report fields
       if (!report.categories) {
         core.warning(`Invalid file ${file}`);
         continue;
       }
 
+      // 2. Get the URL from the report
+      const url = report?.finalUrl || '/main';
+      let urlPath = url.replace(/(^\w+:|^)\/\/[^/]+/, '');
+      urlPath = urlPath == '/' ? '/main' : urlPath;
+
+      // 3. Create the SVGs for the specified categories as action input
       for (const label of resultCategories) {
         const score = Math.ceil((report.categories[label]?.score * 100));
-        const url = report?.finalUrl || '/main';
-        let urlPath = url.replace(/(^\w+:|^)\/\/[^/]+/, '');
-        urlPath = urlPath == '/' ? '/main' : urlPath;
         let color = 'red';
         if (score >= 90) color = 'green';
         else if (score >= 50) color = 'orange';
@@ -56,7 +61,6 @@ async function run() {
 
         fs.writeFileSync(svgFileName, svg);
 
-        // Subir el SVG a S3 o Azure
         if (uploadDestination === 's3') {
           const rawName = `${s3Prefix}${urlPath}.${label}.svg`;
           await uploadToS3(svgFileName, s3BucketName, s3AccessKeyId, s3SecretAccessKey, s3Region, rawName);
@@ -64,6 +68,17 @@ async function run() {
           await uploadToAzure(svgFileName, azureContainerName, azureStorageAccountName, azureStorageAccountKey);
         }
       }
+
+      // 4. Upload the report to the specified if needed
+      if (uploadReports === 'true') {
+        const rawName = `${s3Prefix}${urlPath}.report.json`;
+        if (uploadDestination === 's3') {
+          await uploadToS3(path.join(reportsPath, file), s3BucketName, s3AccessKeyId, s3SecretAccessKey, s3Region, rawName, 'application/json');
+        } else if (uploadDestination === 'azure') {
+          await uploadToAzure(path.join(reportsPath, file), azureContainerName, azureStorageAccountName, azureStorageAccountKey);
+        }
+      }
+
     }
   } catch (error: any) {
     core.setFailed(`Action failed with error: ${error.message}`);
@@ -78,7 +93,7 @@ async function run() {
  * @param secretAccessKey 
  * @param region 
  */
-async function uploadToS3(filePath: string, bucketName: string, accessKeyId: string, secretAccessKey: string, region: string, rawName: string) {
+async function uploadToS3(filePath: string, bucketName: string, accessKeyId: string, secretAccessKey: string, region: string, rawName: string, contentType = 'image/svg+xml') {
   const s3 = new AWS.S3({
     accessKeyId,
     secretAccessKey,
@@ -91,7 +106,7 @@ async function uploadToS3(filePath: string, bucketName: string, accessKeyId: str
     Bucket: bucketName,
     Key: rawName,
     Body: fileContent,
-    ContentType: 'image/svg+xml',
+    ContentType: contentType,
   };
 
   try {

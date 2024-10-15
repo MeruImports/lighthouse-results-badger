@@ -27,6 +27,7 @@
 | `upload-destination`        | Destination for uploading SVG badges: `"s3"` or `"azure"`.     | true     | `s3`    |
 | `report-path`               | Path to the Lighthouse report directory.                       | false    | `.lighthouseci` |
 | `result-categories`         | Comma-separated list of Lighthouse categories to generate badges for. | false | `performance,accessibility,best-practices,seo,pwa` |
+| `upload-reports`            | If set to `true`, uploads the Lighthouse reports along with the badges. | false | `false` |
 
 ## Outputs
 
@@ -61,6 +62,7 @@ jobs:
           upload-destination: 's3'
           report-path: '.lighthouseci'
           result-categories: 'performance,accessibility,best-practices,seo,pwa'
+          upload-reports: 'true'
       
       - name: Output S3 URL
         run: echo "Badges uploaded to: ${{ steps.lighthouse-badger.outputs.s3-url }}"
